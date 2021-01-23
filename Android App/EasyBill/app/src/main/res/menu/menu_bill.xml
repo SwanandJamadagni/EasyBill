@@ -1,0 +1,8 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools" tools:context="sj_infotech.easybill.bill">
+    <item android:id="@+id/action_print" android:title="Print"
+        android:orderInCategory="100" app:showAsAction="never" />
+    <item android:id="@+id/action_close" android:title="Close"
+        android:orderInCategory="100" app:showAsAction="never" />
+</menu>

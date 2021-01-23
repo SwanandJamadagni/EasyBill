@@ -1,0 +1,89 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="sj_infotech.easybill.login"
+    android:id="@+id/loginpage"
+    android:background="#ffffff"
+    android:orientation="vertical"
+    android:baselineAligned="false">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/scrollView2"
+        android:layout_margin="@dimen/abc_action_bar_content_inset_material">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/login_layout">
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textEmailAddress"
+                android:ems="10"
+                android:id="@+id/email_id"
+                android:hint="Email_id"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"
+                android:layout_margin="@dimen/abc_action_bar_content_inset_material" />
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPassword"
+                android:ems="10"
+                android:id="@+id/password_id"
+                android:hint="Password"
+                android:layout_below="@+id/email_id"
+                android:layout_alignStart="@+id/email_id"
+                android:layout_margin="@dimen/abc_action_bar_content_inset_material" />
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPersonName"
+                android:ems="10"
+                android:id="@+id/ipadd"
+                android:layout_below="@+id/password_id"
+                android:layout_alignStart="@+id/password_id"
+                android:hint="IP_Add"
+                android:layout_margin="@dimen/abc_action_bar_content_inset_material" />
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="login"
+                android:id="@+id/login"
+                android:background="@drawable/ripple_effect"
+                android:textColor="@android:color/white"
+                android:onClick="onlogin"
+                android:minWidth="150dip"
+                android:layout_above="@+id/cab"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentStart="true"
+                android:layout_margin="@dimen/abc_action_bar_content_inset_material" />
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="create account"
+                android:id="@+id/cab"
+                android:background="@drawable/ripple_effect"
+                android:textColor="@android:color/white"
+                android:onClick="create_account"
+                android:minWidth="150dip"
+                android:layout_alignParentBottom="true"
+                android:layout_alignEnd="@+id/login"
+                android:layout_alignParentStart="true"
+                android:layout_margin="@dimen/abc_action_bar_content_inset_material" />
+
+        </LinearLayout>
+    </ScrollView>
+
+
+</LinearLayout>

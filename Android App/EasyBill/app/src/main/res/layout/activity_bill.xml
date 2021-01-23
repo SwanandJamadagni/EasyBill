@@ -1,0 +1,110 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="wrap_content" android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    tools:context="sj_infotech.easybill.bill"
+    android:orientation="vertical">
+
+    <ListView
+        android:layout_width="fill_parent"
+        android:layout_height="@dimen/abc_action_bar_stacked_tab_max_width"
+        android:id="@+id/listView"
+        android:layout_alignParentStart="true"
+        android:layout_margin="@dimen/abc_action_bar_content_inset_material" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/scrollView4" >
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/abc_action_bar_content_inset_material">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="Total"
+                    android:id="@+id/totaltv"
+                    android:textColor="@android:color/black"
+                    android:layout_alignBottom="@+id/total"
+                    android:layout_alignParentStart="true"
+                    android:layout_marginLeft="@dimen/abc_action_bar_content_inset_material"
+                    android:layout_marginRight="@dimen/abc_action_bar_content_inset_material" />
+
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textPersonName"
+                    android:ems="10"
+                    android:id="@+id/total"
+                    android:layout_centerVertical="true"
+                    android:layout_toEndOf="@+id/done"
+                    android:layout_marginRight="@dimen/abc_action_bar_content_inset_material"
+                    android:layout_marginLeft="@dimen/abc_action_bar_content_inset_material"
+                    android:editable="false"
+                    android:enabled="false"
+                    android:textColor="@android:color/black" />
+
+            </LinearLayout>
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:ems="10"
+                android:id="@+id/discount"
+                android:hint="Discount"
+                android:layout_below="@+id/total"
+                android:layout_alignStart="@+id/total"
+                android:layout_margin="@dimen/abc_action_bar_content_inset_material" />
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="number|phone"
+                android:ems="10"
+                android:id="@+id/phoneno"
+                android:hint="Phone Number"
+                android:layout_below="@+id/discount"
+                android:layout_alignStart="@+id/discount"
+                android:layout_margin="@dimen/abc_action_bar_content_inset_material" />
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Done"
+                android:id="@+id/done"
+                android:background="@drawable/ripple_effect"
+                android:textColor="@android:color/white"
+                android:onClick="ondone"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentStart="true"
+                android:layout_margin="@dimen/abc_action_bar_content_inset_material" />
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Generate Bill"
+                android:id="@+id/gen_bill"
+                android:layout_alignTop="@+id/done"
+                android:layout_alignParentEnd="true"
+                android:background="@drawable/ripple_effect"
+                android:textColor="@android:color/white"
+                android:onClick="ongenbill"
+                android:layout_margin="@dimen/abc_action_bar_content_inset_material" />
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>

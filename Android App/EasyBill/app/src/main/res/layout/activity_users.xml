@@ -1,0 +1,112 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="sj_infotech.easybill.users"
+    android:id="@+id/users"
+    android:background="#ffffff"
+    android:orientation="vertical"
+    android:baselineAligned="false">
+
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/scrollView"
+        android:fillViewport="false"
+        android:layout_margin="@dimen/abc_action_bar_content_inset_material">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPersonName"
+                android:ems="10"
+                android:id="@+id/fname_id"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"
+                android:hint="First_Name"
+                android:layout_margin="@dimen/abc_action_bar_content_inset_material" />
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPersonName"
+                android:ems="10"
+                android:id="@+id/lname_id"
+                android:layout_centerHorizontal="true"
+                android:hint="Last_name"
+                android:layout_margin="@dimen/abc_action_bar_content_inset_material" />
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textEmailAddress"
+                android:ems="10"
+                android:id="@+id/email_id"
+                android:layout_centerHorizontal="true"
+                android:hint="Email_id"
+                android:layout_margin="@dimen/abc_action_bar_content_inset_material" />
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPassword"
+                android:ems="10"
+                android:id="@+id/password_id"
+                android:layout_centerHorizontal="true"
+                android:hint="Password"
+                android:layout_margin="@dimen/abc_action_bar_content_inset_material" />
+
+            <CheckBox
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Admin"
+                android:id="@+id/admin"
+                android:layout_margin="@dimen/abc_action_bar_content_inset_material"
+                android:checked="false" />
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPassword"
+                android:ems="10"
+                android:id="@+id/admin_pass"
+                android:hint="Admin Password"
+                android:layout_margin="@dimen/abc_action_bar_content_inset_material" />
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPersonName"
+                android:ems="10"
+                android:id="@+id/ip"
+                android:layout_alignStart="@+id/password_id"
+                android:hint="IP_Add"
+                android:layout_margin="@dimen/abc_action_bar_content_inset_material" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="apply"
+                android:id="@+id/apply"
+                android:background="@drawable/ripple_effect"
+                android:textColor="@android:color/white"
+                android:onClick="create_user"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                android:layout_gravity="center"
+                style="@android:style/Animation"
+                android:layout_marginTop="@dimen/abc_action_bar_default_height_material" />
+
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>
+
+
