@@ -1,13 +1,15 @@
 package sj_infotech.easybill;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -22,44 +24,54 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Add_Stock extends AppCompatActivity {
-    EditText et_product_id,et_description, et_category,et_prize,et_quantity;
-    String product_id,category,description,prize,quantity,FS_Quantity;
+public class Add_Stock_Cash_Register extends AppCompatActivity {
+    EditText et_description, et_prize,et_quantity;
+    String description,prize,quantity,FS_Quantity;
     FirebaseFirestore FireStoreDB;
+    String items;
+    String [] itemlist;
+    Spinner myspinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add__stock);
+        setContentView(R.layout.activity_add__stock__cash_register);
 
         FireStoreDB = FirebaseFirestore.getInstance();
 
-        et_product_id = (EditText)findViewById(R.id.product_id);
-        et_category = (EditText)findViewById(R.id.category);
-        et_description = (EditText)findViewById(R.id.description);
+        SharedPreferences sharedPreferences_items = getSharedPreferences("Cash_Register_Info", Context.MODE_PRIVATE);
+        items = sharedPreferences_items.getString("items", "");
+        itemlist = items.split(", ");
+
+        myspinner = (Spinner) findViewById(R.id.spinner3);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(Add_Stock_Cash_Register.this, android.R.layout.simple_list_item_1,itemlist);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        myspinner.setAdapter(adapter);
+        myspinner.setSelection(0);
+
+        et_description = (EditText) findViewById(R.id.description);
         et_prize = (EditText)findViewById(R.id.prize);
         et_quantity = (EditText)findViewById(R.id.quantity);
-        SharedPreferences sharedPreferences_product = getSharedPreferences("product", Context.MODE_PRIVATE);
-        product_id = sharedPreferences_product.getString("product_id", "");
-        category = sharedPreferences_product.getString("category", "");
-        description = sharedPreferences_product.getString("description", "");
-        prize = sharedPreferences_product.getString("prize", "");
-        quantity = sharedPreferences_product.getString("quantity", "");
-        et_product_id.setText(product_id);
-        et_category.setText(category);
-        et_description.setText(description);
-        et_prize.setText(prize);
-        et_quantity.setText(quantity);
 
-
-
+        myspinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (position == 0){
+                    et_description.setText("");
+                }
+                else {
+                    et_description.setText(parent.getItemAtPosition(position).toString());
+                }
+            }
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
     }
 
     public void add_stock(){
 
         //Toast.makeText(Add_Stock_Cash_Register.this, description+"-"+prize+"-"+quantity, Toast.LENGTH_LONG).show();
 
-        Task<DocumentSnapshot> MyDoc = FireStoreDB.document("/Billing_App/Store_Demo/EPOS_Products/"+product_id)
+        Task<DocumentSnapshot> MyDoc = FireStoreDB.document("/Billing_App/Store_Demo/Cash_Register_Products/"+description)
                 .get()
                 .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                     @Override
@@ -71,34 +83,30 @@ public class Add_Stock extends AppCompatActivity {
                             int Updated_Quantity = (Integer.parseInt(FS_Quantity) + Integer.parseInt(quantity));
 
                             Map<String, Object> product = new HashMap<>();
-                            product.put("Category", category);
-                            product.put("Description", description);
                             product.put("Prize", prize);
                             product.put("Quantity", Updated_Quantity);
 
                             try {
-                                FireStoreDB.collection("/Billing_App/Store_Demo/EPOS_Products/").document(product_id).set(product);
-                                Toast.makeText(Add_Stock.this, "Stock_Added_Successfully", Toast.LENGTH_LONG).show();
+                                FireStoreDB.collection("/Billing_App/Store_Demo/Cash_Register_Products/").document(description).set(product);
+                                Toast.makeText(Add_Stock_Cash_Register.this, "Stock_Added_Successfully", Toast.LENGTH_LONG).show();
                             }
                             catch (Exception e){
-                                Toast.makeText(Add_Stock.this, "Error_Adding_Stock", Toast.LENGTH_LONG).show();
+                                Toast.makeText(Add_Stock_Cash_Register.this, "Error_Adding_Stock", Toast.LENGTH_LONG).show();
                             }
                         }
 
                         else {
 
                             Map<String, Object> product = new HashMap<>();
-                            product.put("Category", category);
-                            product.put("Description", description);
                             product.put("Prize", prize);
                             product.put("Quantity", quantity);
 
                             try {
-                                FireStoreDB.collection("/Billing_App/Store_Demo/EPOS_Products/").document(product_id).set(product);
-                                Toast.makeText(Add_Stock.this, "Stock_Added_Successfully", Toast.LENGTH_LONG).show();
+                                FireStoreDB.collection("/Billing_App/Store_Demo/Cash_Register_Products/").document(description).set(product);
+                                Toast.makeText(Add_Stock_Cash_Register.this, "Stock_Added_Successfully", Toast.LENGTH_LONG).show();
                             }
                             catch (Exception e){
-                                Toast.makeText(Add_Stock.this, "Error_Adding_Stock", Toast.LENGTH_LONG).show();
+                                Toast.makeText(Add_Stock_Cash_Register.this, "Error_Adding_Stock", Toast.LENGTH_LONG).show();
                             }
 
                         }
@@ -107,25 +115,28 @@ public class Add_Stock extends AppCompatActivity {
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(Add_Stock.this, "Error while connecting to DataBase", Toast.LENGTH_LONG).show();
+                        Toast.makeText(Add_Stock_Cash_Register.this, "Error while connecting to DataBase", Toast.LENGTH_LONG).show();
                     }
                 });
     }
 
     public void onaddstock(View view){
-        category = et_category.getText().toString();
         description = et_description.getText().toString();
         prize = et_prize.getText().toString();
         quantity = et_quantity.getText().toString();
         add_stock();
 
 
+        /*SharedPreferences sharedPreferences = getSharedPreferences("userinfo", Context.MODE_PRIVATE);
+        type = "add_stock_uncoded_product";
+        BackgroundWorker backgroundWorker = new BackgroundWorker(this);
+        backgroundWorker.execute(ip, type, description, prize, quantity);*/
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_add__stock, menu);
+        getMenuInflater().inflate(R.menu.menu_add__uncoded__product, menu);
         return true;
     }
 
@@ -134,19 +145,11 @@ public class Add_Stock extends AppCompatActivity {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        switch (item.getItemId()){
+        int id = item.getItemId();
 
-            case R.id.action_logout:
-                String log = "0";
-                SharedPreferences sharedPreferences = getSharedPreferences("userinfo", Context.MODE_PRIVATE);
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putString("password", "0");
-                editor.apply();
-                Intent intent = new Intent(Add_Stock.this, login.class);
-                finish();
-                startActivity(intent);
-                return true;
-
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            return true;
         }
 
         return super.onOptionsItemSelected(item);

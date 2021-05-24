@@ -1,6 +1,5 @@
 package sj_infotech.easybill;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -41,43 +40,40 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
-public class printbill extends AppCompatActivity {
-        String ip, email, discount;
-        AlertDialog alertdialog;
-        private Bitmap bitmap;
-        private LinearLayout pdf;
-        TableLayout tableLayout;
-        String[] scanlist;
-        int total = 0;
-        String[] scan;
-        String toNumber, DownloadUrl;
-        FirebaseStorage firebaseStorage;
-        Task<Uri> url;
+public class cash_register_bill extends AppCompatActivity {
+    String ip, email, discount;
+    TableLayout tableLayout;
+    String[] itemlist;
+    int total = 0;
+    String[] items;
+    private Bitmap bitmap;
+    private LinearLayout pdf;
+    String toNumber, DownloadUrl;
+    Task<Uri> url;
+    FirebaseStorage firebaseStorage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_printbill);
+        setContentView(R.layout.activity_cash_register_bill);
 
         firebaseStorage = FirebaseStorage.getInstance();
 
         SharedPreferences sharedPreferences1 = getSharedPreferences("phoneinfo", Context.MODE_PRIVATE);
         toNumber = sharedPreferences1.getString("phonenum", "");
 
-
         Intent callingIntent= getIntent();
-        scanlist = (String[]) callingIntent.getSerializableExtra("Scan");
+        itemlist = (String[]) callingIntent.getSerializableExtra("Items");
         discount = (String) callingIntent.getSerializableExtra("Discount");
 
 
-        pdf = (LinearLayout) findViewById(R.id.printbilllayout);
+        pdf = (LinearLayout) findViewById(R.id.manualprintbilllayout);
 
-
-        /*SharedPreferences sharedPreferences = getSharedPreferences("userinfo", Context.MODE_PRIVATE);
+        SharedPreferences sharedPreferences = getSharedPreferences("userinfo", Context.MODE_PRIVATE);
         ip = sharedPreferences.getString("ip", "");
-        email = sharedPreferences.getString("email", "");*/
+        email = sharedPreferences.getString("email", "");
 
-        tableLayout = (TableLayout) findViewById(R.id.table1);
+        tableLayout = (TableLayout) findViewById(R.id.table);
 
         TableRow tr = new TableRow(this);
         TextView tv = new TextView(this);
@@ -109,17 +105,17 @@ public class printbill extends AppCompatActivity {
         tr1.setGravity(Gravity.CENTER);
         tableLayout.addView(tr1);
 
-        for(int i = 0; i < scanlist.length; i++) {
+        for(int i = 0; i < itemlist.length; i++) {
 
 
-            scan = scanlist[i].split(":");
+            items = itemlist[i].split(":");
             TableRow tr2 = new TableRow(this);
             TextView tv4 = new TextView(this);
-            tv4.setText(scan[1]);
+            tv4.setText(items[0]);
             tv4.setGravity(Gravity.LEFT);
             tr2.addView(tv4);
             TextView tv5 = new TextView(this);
-            tv5.setText(scan[3]);
+            tv5.setText(items[2]);
             tv5.setGravity(Gravity.CENTER);
             tr2.addView(tv5);
             TextView tve1 = new TextView(this);
@@ -127,12 +123,12 @@ public class printbill extends AppCompatActivity {
             tve1.setGravity(Gravity.RIGHT);
             tr2.addView(tve1);
             TextView tv6 = new TextView(this);
-            tv6.setText(scan[2]);
+            tv6.setText(items[1]);
             tv6.setGravity(Gravity.RIGHT);
             tr2.addView(tv6);
             tr2.setGravity(Gravity.CENTER);
             tableLayout.addView(tr2);
-            total = total + (Integer.parseInt(scan[2]) * Integer.parseInt(scan[3]));
+            total = total + (Integer.parseInt(items[1]) * Integer.parseInt(items[2]));
         }
 
 
@@ -177,7 +173,7 @@ public class printbill extends AppCompatActivity {
         tvspace1.setGravity(Gravity.RIGHT);
         tr4.addView(tvspace1);
         TextView tvdiscountamount = new TextView(this);
-        tvdiscountamount.setText(discount.toString());
+        tvdiscountamount.setText(discount);
         tvdiscountamount.setGravity(Gravity.RIGHT);
         tr4.addView(tvdiscountamount);
         tr4.setGravity(Gravity.CENTER);
@@ -204,14 +200,12 @@ public class printbill extends AppCompatActivity {
         tr5.addView(tvpayamount);
         tr5.setGravity(Gravity.CENTER);
         tableLayout.addView(tr5);
-
     }
 
 
     public void onpdf(View view){
         /*String email = emailet.getText().toString();
         createPdf(email);*/
-        //bitmap = loadBitmapFromView(pdf, pdf.getWidth(), pdf.getHeight());
         bitmap = loadBitmapFromView(pdf, 1200, 1600);
         createPdf();
     }
@@ -257,7 +251,7 @@ public class printbill extends AppCompatActivity {
 
 
         // write the document content
-        String directory_path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/EasyBill/EPOS/";
+        String directory_path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/EasyBill/CashReg/";
         File file = new File(directory_path);
         if (!file.exists()) {
             file.mkdirs();
@@ -268,7 +262,7 @@ public class printbill extends AppCompatActivity {
             document.writeTo(new FileOutputStream(filePath));
             UploadPdf();
         } catch (IOException e) {
-            Toast.makeText(this, "Something Went wrong: " + e.toString(),  Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Something Went Wrong: " + e.toString(),  Toast.LENGTH_LONG).show();
         }
         // close the document
         document.close();
@@ -277,12 +271,12 @@ public class printbill extends AppCompatActivity {
     public void UploadPdf(){
 
         File Root = Environment.getExternalStorageDirectory();
-        File Dir = new File(Root.getAbsolutePath()+"/EasyBill/EPos");
+        File Dir = new File(Root.getAbsolutePath()+"/EasyBill/CashReg");
         File pdfFile = new File(Dir+"/"+"bill_"+toNumber+".pdf");
         Uri file = Uri.fromFile(pdfFile);
 
         final StorageReference storageReference = firebaseStorage.getReference();// Root path for the FireBase Storage
-        final StorageReference sref = storageReference.child("Store_Demo/EPos/"+file.getLastPathSegment());
+        final StorageReference sref = storageReference.child("Store_Demo/Cash_Register/"+file.getLastPathSegment());
         sref.putFile(file)
                 .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                     @Override
@@ -293,21 +287,22 @@ public class printbill extends AppCompatActivity {
                             public void onComplete(@NonNull Task<Uri> task) {
                                 try {
                                     DownloadUrl = URLEncoder.encode(DownloadUrl = task.getResult().toString(),"UTF-8");
-                                    Toast.makeText(printbill.this, "PDF Generated", Toast.LENGTH_LONG).show();
+                                    Toast.makeText(cash_register_bill.this, "PDF Generated", Toast.LENGTH_LONG).show();
                                 } catch (UnsupportedEncodingException e) {
-                                    Toast.makeText(printbill.this, "Error Generating The PDF: " + e.toString(),  Toast.LENGTH_LONG).show();
+                                    Toast.makeText(cash_register_bill.this, "Error Generating The PDF: " + e.toString(),  Toast.LENGTH_LONG).show();
                                 }
+
                             }
                         });
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(printbill.this, "Error Uploading The File", Toast.LENGTH_LONG).show();
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(cash_register_bill.this, "Error Uploading The File", Toast.LENGTH_LONG).show();
 
-                    }
-                });
+            }
+        });
 
     }
 
@@ -330,5 +325,4 @@ public class printbill extends AppCompatActivity {
         }
 
     }
-
 }

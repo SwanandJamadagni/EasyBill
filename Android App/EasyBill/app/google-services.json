@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "228006314862",
+    "firebase_url": "https://billing-app-221113.firebaseio.com",
+    "project_id": "billing-app-221113",
+    "storage_bucket": "billing-app-221113.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:228006314862:android:07fa9f8e083b744383377f",
+        "android_client_info": {
+          "package_name": "sj_infotech.easybill"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "228006314862-9oerrki8f9etk9afhitm0sp7lnnbngcn.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "sj_infotech.easybill",
+            "certificate_hash": "8ffae89c39b5425ded49f7328bf236d81e65bb74"
+          }
+        },
+        {
+          "client_id": "228006314862-kgt4sim93kgshttaabuhd72h0s1of3q2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCopgBhesRP5u3FhylJ8sui2IeAfgke0oI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "228006314862-kgt4sim93kgshttaabuhd72h0s1of3q2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

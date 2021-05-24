@@ -1,0 +1,26 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:ads="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:weightSum="1"
+    tools:context="sj_infotech.easybill.Admin">
+
+    <Button
+        android:id="@+id/Add_Users_Firestore"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="Add_Users_Firestore"
+        android:text="Add_Users"
+        tools:ignore="OnClick" />
+
+    <Button
+        android:id="@+id/Read_data_firestore"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="Read_Data_Firestore"
+        android:text="Read_Data"
+        tools:ignore="OnClick" />
+</LinearLayout>

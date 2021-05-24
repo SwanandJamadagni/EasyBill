@@ -1,12 +1,9 @@
 package sj_infotech.easybill;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
-import android.os.Handler;
-import android.os.Looper;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

@@ -7,15 +7,24 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.InputType;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.zxing.Result;
 
 import java.io.Serializable;
@@ -29,15 +38,21 @@ public class Scan_Product extends AppCompatActivity implements ZXingScannerView.
     private ZXingScannerView scannerView;
     final List<String> barcodelist = new ArrayList<String>();
     String ip,type;
-    String scandata = "";
+    String scandata;
     private String quantity = "";
     AlertDialog alertdialog;
+
+    FirebaseFirestore FireStoreDB;
+    String FS_Category, FS_Description, FS_Prize, FS_Quantity;
+    int total = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         scannerView = new ZXingScannerView(this);
         setContentView(scannerView);
+
+        FireStoreDB = FirebaseFirestore.getInstance();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if(checkPermisssion()){
@@ -143,30 +158,126 @@ public class Scan_Product extends AppCompatActivity implements ZXingScannerView.
     public void handleResult(Result result) {
         final String scanresult = result.getText();
         final EditText input = new EditText(this);
+        input.setInputType(InputType.TYPE_CLASS_NUMBER);
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("scan result");
         builder.setView(input);
-        builder.setPositiveButton("ok", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton("Scan", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
+                scandata = scanresult.toString();
                 quantity = input.getText().toString();
                 if (quantity.isEmpty()){
                     quantity = "1";
                 }
-                barcodelist.add(scanresult.concat(":").concat(quantity));
-                scannerView.resumeCameraPreview(Scan_Product.this);
 
+                final Task<DocumentSnapshot> MyDoc = FireStoreDB.document("/Billing_App/Store_Demo/EPOS_Products/"+scandata)
+                        .get()
+                        .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                            @Override
+                            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                if (documentSnapshot.exists()) {
+                                    FS_Category = documentSnapshot.get("Category").toString();
+                                    FS_Description = documentSnapshot.get("Description").toString();
+                                    FS_Prize = documentSnapshot.get("Prize").toString();
+                                    FS_Quantity = documentSnapshot.get("Quantity").toString();
+                                    total += Integer.parseInt(FS_Prize) * Integer.parseInt(quantity);
+                                    String Updated_Quantity = Integer.toString(Integer.parseInt(FS_Quantity)-Integer.parseInt(quantity));
+
+                                    DocumentReference DocRef = FireStoreDB.document("/Billing_App/Store_Demo/EPOS_Products/"+scandata);
+                                    DocRef
+                                            .update("Quantity", Updated_Quantity)
+                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+                                                    Toast.makeText(Scan_Product.this, "Quantity Updated", Toast.LENGTH_LONG).show();
+                                                }
+                                            })
+                                            .addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception e) {
+                                                    Toast.makeText(Scan_Product.this, "Error Updating Quantity", Toast.LENGTH_LONG).show();
+                                                }
+                                            });
+
+                                } else {
+                                    Toast.makeText(Scan_Product.this, "Product Not Added To Stock", Toast.LENGTH_LONG).show();
+                                }
+                                barcodelist.add(scandata.concat(":").concat(FS_Description).concat(":").concat(FS_Prize).concat(":").concat(quantity));
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Toast.makeText(Scan_Product.this, "Error while connecting to DataBase", Toast.LENGTH_LONG).show();
+                            }
+                        });
+
+                scannerView.resumeCameraPreview(Scan_Product.this);
             }
         });
-        builder.setNeutralButton("print", new DialogInterface.OnClickListener() {
+        builder.setNeutralButton("Bill", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
+                scandata = scanresult.toString();
                 quantity = input.getText().toString();
                 if (quantity.isEmpty()){
                     quantity = "1";
                 }
-                barcodelist.add(scanresult.concat(":").concat(quantity));
-                for (int j = 0; j < barcodelist.size(); j++){
+
+                Task<DocumentSnapshot> MyDoc = FireStoreDB.document("/Billing_App/Store_Demo/EPOS_Products/"+scandata)
+                        .get()
+                        .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                            @Override
+                            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                if (documentSnapshot.exists()) {
+                                    FS_Category = documentSnapshot.get("Category").toString();
+                                    FS_Description = documentSnapshot.get("Description").toString();
+                                    FS_Prize = documentSnapshot.get("Prize").toString();
+                                    FS_Quantity = documentSnapshot.get("Quantity").toString();
+                                    total = total + (Integer.parseInt(FS_Prize) * Integer.parseInt(quantity));
+                                    String Updated_Quantity = Integer.toString(Integer.parseInt(FS_Quantity)-Integer.parseInt(quantity));
+
+                                    DocumentReference DocRef = FireStoreDB.document("/Billing_App/Store_Demo/EPOS_Products/"+scandata);
+                                    DocRef
+                                            .update("Quantity", Updated_Quantity)
+                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+                                                    Toast.makeText(Scan_Product.this, "Quantity Updated", Toast.LENGTH_LONG).show();
+                                                }
+                                            })
+                                            .addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception e) {
+                                                    Toast.makeText(Scan_Product.this, "Error Updating Quantity", Toast.LENGTH_LONG).show();
+                                                }
+                                            });
+
+
+                                } else {
+                                    Toast.makeText(Scan_Product.this, "Product Not Added To Stock", Toast.LENGTH_LONG).show();
+                                }
+                                barcodelist.add(scandata.concat(":").concat(FS_Description).concat(":").concat(FS_Prize).concat(":").concat(quantity));
+
+                                SharedPreferences sharedPreferences_product = getSharedPreferences("BillInfo", Context.MODE_PRIVATE);
+                                SharedPreferences.Editor editor = sharedPreferences_product.edit();
+                                editor.putString("total", Integer.toString(total));
+                                editor.apply();
+
+                                Intent intent = new Intent(Scan_Product.this, bill.class);
+                                intent.putExtra("Barcodes", (Serializable) barcodelist);
+                                startActivity(intent);
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Toast.makeText(Scan_Product.this, "Error while connecting to DataBase", Toast.LENGTH_LONG).show();
+                            }
+                        });
+
+                /*for (int j = 0; j < barcodelist.size(); j++){
                     scandata += barcodelist.get(j).concat("&");
                 }
                 SharedPreferences sharedPreferences = getSharedPreferences("userinfo", Context.MODE_PRIVATE);
@@ -174,7 +285,8 @@ public class Scan_Product extends AppCompatActivity implements ZXingScannerView.
                 type = "getproducts";
                 DBHandler dbHandler = new DBHandler(Scan_Product.this);
                 dbHandler.execute(ip, type, scandata);
-                finish();
+                finish();*/
+
             }
         });
         builder.setMessage(scanresult);

@@ -7,30 +7,38 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.google.zxing.Result;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
-import java.io.Serializable;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.zxing.Result;
 
 import me.dm7.barcodescanner.zxing.ZXingScannerView;
 
 public class Add_Product extends AppCompatActivity implements ZXingScannerView.ResultHandler {
     private static final int REQUEST_CAMERA = 1;
     private ZXingScannerView scannerView;
-    String product_id,type,ip;
+    String product_id, FS_Category, FS_Description, FS_Prize;
+    FirebaseFirestore FireStoreDB;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         scannerView = new ZXingScannerView(this);
         setContentView(scannerView);
+
+        FireStoreDB = FirebaseFirestore.getInstance();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if(checkPermisssion()){
@@ -140,25 +148,56 @@ public class Add_Product extends AppCompatActivity implements ZXingScannerView.R
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 product_id = scanresult.toString();
-                SharedPreferences sharedPreferences_product = getSharedPreferences("product", Context.MODE_PRIVATE);
-                SharedPreferences.Editor editor = sharedPreferences_product.edit();
-                editor.putString("product_id", product_id);
-                editor.apply();
-                SharedPreferences sharedPreferences = getSharedPreferences("userinfo", Context.MODE_PRIVATE);
-                ip = sharedPreferences.getString("ip", "");
-                type = "getcategory";
-                GetCategory_Barcode getCategory_barcode = new GetCategory_Barcode(Add_Product.this);
-                getCategory_barcode.execute(ip, type);
-                //Intent intent = new Intent(Add_Product.this, Add_Stock.class);
-                //intent.putExtra("Product", (Serializable) product_id);
-                finish();
-                //startActivity(intent);
+
+                Task<DocumentSnapshot> MyDoc = FireStoreDB.document("/Billing_App/Store_Demo/EPOS_Products/"+product_id)
+                        .get()
+                        .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                            @Override
+                            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                if (documentSnapshot.exists()) {
+                                    FS_Category = documentSnapshot.get("Category").toString();
+                                    FS_Description = documentSnapshot.get("Description").toString();
+                                    FS_Prize = documentSnapshot.get("Prize").toString();
+                                    SharedPreferences sharedPreferences_product = getSharedPreferences("product", Context.MODE_PRIVATE);
+                                    SharedPreferences.Editor editor = sharedPreferences_product.edit();
+                                    editor.putString("product_id", product_id);
+                                    editor.putString("category", FS_Category);
+                                    editor.putString("description", FS_Description);
+                                    editor.putString("prize", FS_Prize);
+                                    editor.apply();
+
+                                    Intent intent = new Intent(Add_Product.this, Add_Stock.class);
+                                    startActivity(intent);
+
+                                } else {
+                                    FS_Category = "";
+                                    FS_Description = "";
+                                    FS_Prize = "";
+                                    SharedPreferences sharedPreferences_product = getSharedPreferences("product", Context.MODE_PRIVATE);
+                                    SharedPreferences.Editor editor = sharedPreferences_product.edit();
+                                    editor.putString("product_id", product_id);
+                                    editor.putString("category", FS_Category);
+                                    editor.putString("description", FS_Description);
+                                    editor.putString("prize", FS_Prize);
+                                    editor.apply();
+
+                                    Intent intent = new Intent(Add_Product.this, Add_Stock.class);
+                                    startActivity(intent);
+                                }
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Toast.makeText(Add_Product.this, "Error while connecting to DataBase", Toast.LENGTH_LONG).show();
+                            }
+                        });
+
             }
         });
         builder.setMessage(scanresult);
         AlertDialog alert = builder.create();
         alert.show();
-
     }
 
 

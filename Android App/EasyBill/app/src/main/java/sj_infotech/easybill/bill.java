@@ -1,55 +1,61 @@
 package sj_infotech.easybill;
 
 import android.app.AlertDialog;
-import android.app.DownloadManager;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
-import android.os.Environment;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 
-import java.io.File;
-import java.io.IOException;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+
 import java.io.Serializable;
-import java.net.URI;
-import java.nio.file.Files;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
 public class bill extends AppCompatActivity {
-    Button genbill;
     List<String> barcodes;
     ArrayAdapter<String> adapter;
-    String[] scan;
-    String[] item;
-    int[] prize;
+    String[] scan, product;
+    String item, quantity, prize;
+    int FS_Quantity;
     String scandata = "";
     EditText discountet, totalet, phoneno;
-    int total = 0;
+    String total;
     String phonenumber, ip, type, email, discount;
     AlertDialog alertdialog;
+    FirebaseFirestore FireStoreDB;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bill);
-        genbill = (Button) findViewById(R.id.gen_bill);
-        genbill.setEnabled(false);
+
+        FireStoreDB = FirebaseFirestore.getInstance();
+
+        SharedPreferences sharedPreferences_product = getSharedPreferences("BillInfo", Context.MODE_PRIVATE);
+        total = sharedPreferences_product.getString("total", "");
+        
         discountet = (EditText)findViewById(R.id.discount);
         phoneno = (EditText)findViewById(R.id.phoneno);
         totalet = (EditText)findViewById(R.id.total);
+        totalet.setText(total);
         Intent callingIntent= getIntent();
         barcodes = (List<String>) callingIntent.getSerializableExtra("Barcodes");
         adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, barcodes);
@@ -58,57 +64,92 @@ public class bill extends AppCompatActivity {
         listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
-
-
+                product = barcodes.get(i).split(":");
+                item = product[0];
+                prize = product[2];
+                quantity = product[3];
+                total = Integer.toString(Integer.parseInt(total) - (Integer.parseInt(prize) * Integer.parseInt(quantity)));
+                totalet.setText(total);
+                remove_item();
                 barcodes.remove(i);
                 adapter.notifyDataSetChanged();
-                prize = new int[adapter.getCount()];
-                for (int k = 0; k < adapter.getCount(); k++) {
-                    item = adapter.getItem(k).split(":");
-                    prize[k] = (Integer.parseInt(item[2])*Integer.parseInt(item[3]));
-                }
-                total = 0;
-                for (int j = 0; j < prize.length; j++) {
-                    total = total + prize[j];
-                }
-
-                totalet.setText(Integer.toString(total));
                 return false;
             }
         });
-        prize = new int[adapter.getCount()];
-        for (int k = 0; k < adapter.getCount(); k++) {
-            item = adapter.getItem(k).split(":");
-            prize[k] = (Integer.parseInt(item[2])*Integer.parseInt(item[3]));
-        }
-        for (int j = 0; j < prize.length; j++) {
-            total = total + prize[j];
-        }
-        totalet.setText(Integer.toString(total));
+    }
+
+    public void remove_item(){
+
+        final Task<DocumentSnapshot> MyDoc = FireStoreDB.document("/Billing_App/Store_Demo/EPOS_Products/"+item)
+                .get()
+                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                    @Override
+                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                        if (documentSnapshot.exists()) {
+                            FS_Quantity = Integer.parseInt(documentSnapshot.get("Quantity").toString());
+                            String Updated_Quantity = Integer.toString(FS_Quantity+Integer.parseInt(quantity));
+
+                            DocumentReference DocRef = FireStoreDB.document("/Billing_App/Store_Demo/EPOS_Products/"+item);
+                            DocRef
+                                    .update("Quantity", Updated_Quantity)
+                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            Toast.makeText(bill.this, "Quantity Updated", Toast.LENGTH_LONG).show();
+                                        }
+                                    })
+                                    .addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            Toast.makeText(bill.this, "Error Updating Quantity", Toast.LENGTH_LONG).show();
+                                        }
+                                    });
+
+                        } else {
+                            Toast.makeText(bill.this, "Product Not Added To Stock", Toast.LENGTH_LONG).show();
+                        }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(bill.this, "Error while connecting to DataBase", Toast.LENGTH_LONG).show();
+                    }
+                });
     }
 
 
 
     public void ondone(View view){
         discount = discountet.getText().toString();
+        if (discount.isEmpty()){
+            discount = "0";
+        }
         phonenumber = phoneno.getText().toString();
-        SharedPreferences sharedPreferences = getSharedPreferences("userinfo", Context.MODE_PRIVATE);
+        /*SharedPreferences sharedPreferences = getSharedPreferences("userinfo", Context.MODE_PRIVATE);
         ip = sharedPreferences.getString("ip", "");
-        email = sharedPreferences.getString("email", "");
+        email = sharedPreferences.getString("email", "");*/
 
         SharedPreferences sharedPreferences1 = getSharedPreferences("phoneinfo", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences1.edit();
         editor.putString("phonenum", phonenumber);
         editor.apply();
-        genbill.setEnabled(true);
-        type = "done";
+        //genbill.setEnabled(true);
+        //type = "done";
         scan = new String[adapter.getCount()];
         for (int i = 0; i < adapter.getCount(); i++){
             scan[i] = adapter.getItem(i);
-            scandata += scan[i].concat("&");
+            //scandata += scan[i].concat("&");
         }
-        BackgroundWorker backgroundWorker = new BackgroundWorker(this);
-        backgroundWorker.execute(ip, type, scandata, discount, phonenumber, email);
+        /*BackgroundWorker backgroundWorker = new BackgroundWorker(this);
+        backgroundWorker.execute(ip, type, scandata, discount, phonenumber, email);*/
+
+        ProgressDialog progress;
+        progress = new ProgressDialog(bill.this);
+        progress.setMessage("Generating Bill");
+        progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progress.show();
+        generatebill();
 
     }
 
@@ -124,26 +165,6 @@ public class bill extends AppCompatActivity {
             }
         }, 2000);
     }
-
-    public void ongenbill(View view){
-        /*SharedPreferences sharedPreferences = getSharedPreferences("userinfo", Context.MODE_PRIVATE);
-        ip = sharedPreferences.getString("ip", "");
-        String user_email = sharedPreferences.getString("email", "");
-        String action = "print";
-        BackgroundWorker backgroundWorker = new BackgroundWorker(this);
-        backgroundWorker.execute(ip, action, user_email);*/
-
-        ProgressDialog progress;
-        progress = new ProgressDialog(bill.this);
-        progress.setMessage("Generating Bill");
-        progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        progress.show();
-        generatebill();
-
-        //Intent intent = new Intent(bill.this, printbill.class);
-        //startActivity(intent);
-    }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

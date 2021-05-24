@@ -43,17 +43,6 @@
                 android:layout_alignStart="@+id/email_id"
                 android:layout_margin="@dimen/abc_action_bar_content_inset_material" />
 
-            <EditText
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="textPersonName"
-                android:ems="10"
-                android:id="@+id/ipadd"
-                android:layout_below="@+id/password_id"
-                android:layout_alignStart="@+id/password_id"
-                android:hint="IP_Add"
-                android:layout_margin="@dimen/abc_action_bar_content_inset_material" />
-
             <Button
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

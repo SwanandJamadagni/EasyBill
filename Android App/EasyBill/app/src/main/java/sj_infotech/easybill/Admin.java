@@ -3,19 +3,44 @@ package sj_infotech.easybill;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.ArrayList;
+import java.util.List;
+
 public class Admin extends AppCompatActivity {
     String ip,type;
+    AdView mAdView1;
+    String mAppUnitId = "ca-app-pub-6634727612331345~3949039676";
+    FirebaseFirestore FireStoreDB;
+    List<String> itemlist = new ArrayList<>();
+    String items;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin);
+
+        FireStoreDB = FirebaseFirestore.getInstance();
+
+        mAdView1 = (AdView) findViewById(R.id.adView1);
+        MobileAds.initialize(this, mAppUnitId);
+        //initializeBannerAd(mAppUnitId);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView1.loadAd(adRequest);
+        //loadBannerAd();
+
     }
 
     public void onadd(View view){
@@ -33,20 +58,18 @@ public class Admin extends AppCompatActivity {
         //startActivity(intent);
     }
 
-    public void onaddcategory(View view){
-        Intent intent = new Intent(Admin.this, Add_Category.class);
-        startActivity(intent);
-    }
-
     public void onadduncoded(View view){
-        Intent intent = new Intent(Admin.this, Add_Uncoded_Product.class);
+
+        Intent intent = new Intent(Admin.this, Add_Stock_Cash_Register.class);
+        startActivity(intent);
+
+    }
+
+    public void gotofirestore(View view){
+        Intent intent = new Intent(Admin.this, FireStore_Demo.class);
         startActivity(intent);
     }
 
-    public void onsqlite(View view){
-        Intent intent = new Intent(Admin.this, SQLite.class);
-        startActivity(intent);
-    }
 
 
     @Override

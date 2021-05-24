@@ -1,14 +1,10 @@
 package sj_infotech.easybill;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
-import android.os.Handler;
-import android.os.Looper;
 import android.widget.Toast;
 
 import java.io.BufferedReader;

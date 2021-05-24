@@ -25,27 +25,6 @@
             <EditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textPersonName"
-                android:ems="10"
-                android:id="@+id/fname_id"
-                android:layout_alignParentTop="true"
-                android:layout_centerHorizontal="true"
-                android:hint="First_Name"
-                android:layout_margin="@dimen/abc_action_bar_content_inset_material" />
-
-            <EditText
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="textPersonName"
-                android:ems="10"
-                android:id="@+id/lname_id"
-                android:layout_centerHorizontal="true"
-                android:hint="Last_name"
-                android:layout_margin="@dimen/abc_action_bar_content_inset_material" />
-
-            <EditText
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
                 android:inputType="textEmailAddress"
                 android:ems="10"
                 android:id="@+id/email_id"
@@ -80,29 +59,37 @@
                 android:hint="Admin Password"
                 android:layout_margin="@dimen/abc_action_bar_content_inset_material" />
 
-            <EditText
+            <Button
+                android:id="@+id/apply"
+                style="@android:style/Animation"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textPersonName"
-                android:ems="10"
-                android:id="@+id/ip"
-                android:layout_alignStart="@+id/password_id"
-                android:hint="IP_Add"
-                android:layout_margin="@dimen/abc_action_bar_content_inset_material" />
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="apply"
-                android:id="@+id/apply"
-                android:background="@drawable/ripple_effect"
-                android:textColor="@android:color/white"
-                android:onClick="create_user"
                 android:layout_alignParentBottom="true"
                 android:layout_centerHorizontal="true"
                 android:layout_gravity="center"
+                android:layout_marginTop="@dimen/abc_action_bar_default_height_material"
+                android:background="@drawable/ripple_effect"
+                android:onClick="create_user"
+                android:text="apply"
+                android:textColor="@android:color/white" />
+
+            <Button
+                android:id="@+id/go_to_login"
                 style="@android:style/Animation"
-                android:layout_marginTop="@dimen/abc_action_bar_default_height_material" />
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                android:layout_gravity="center"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="@dimen/abc_action_bar_default_height_material"
+                android:background="@drawable/ripple_effect"
+                android:onClick="go_back_to_login"
+                android:text="Back To Login"
+                android:textAlignment="center"
+                android:textColor="@android:color/white"
+                android:textSize="14sp"
+                tools:ignore="OnClick" />
 
         </LinearLayout>
     </ScrollView>
